@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VergabeMeister — Deine KI schreibt das Angebot</title>
+    <meta name="description" content="VergabeMeister findet passende Ausschreibungen, formuliert dein Angebot und führt dich Schritt für Schritt bis zur Abgabe.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="VergabeMeister — Deine KI schreibt das Angebot">
+    <meta property="og:description" content="VergabeMeister findet passende Ausschreibungen, formuliert dein Angebot und führt dich Schritt für Schritt bis zur Abgabe.">
+    <meta property="og:type" content="website">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --flag-black: #0D0D0D;
+            --flag-red: #E63946;
+            --flag-gold: #F4D03F;
+            --gray-100: #F7F7F7;
+            --gray-500: #6B6B6B;
+            --gray-700: #333333;
+            --white: #FFFFFF;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font);
+            color: var(--flag-black);
+            line-height: 1.6;
+            background: var(--white);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Tricolor Divider */
+        .tricolor {
+            display: flex;
+            height: 8px;
+        }
+
+        .tricolor span {
+            flex: 1;
+        }
+
+        .tricolor span:nth-child(1) { background: var(--flag-black); }
+        .tricolor span:nth-child(2) { background: var(--flag-red); }
+        .tricolor span:nth-child(3) { background: var(--flag-gold); }
+
+        /* ========== HERO SECTION ========== */
+        .hero {
+            background: var(--flag-black);
+            color: var(--white);
+            padding: 4rem 0 5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            right: -10%;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--flag-red) 0%, var(--flag-red) 50%, var(--flag-gold) 50%);
+            clip-path: polygon(30% 0, 100% 0, 100% 100%, 0% 100%);
+            opacity: 0.08;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+        }
+
+        .hero-logo {
+            font-size: 1.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            margin-bottom: 3rem;
+        }
+
+        .hero-logo .white { color: var(--white); }
+        .hero-logo .red { color: var(--flag-red); }
+        .hero-logo .gold { color: var(--flag-gold); }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            line-height: 1.05;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+
+        .hero h1 .gold {
+            color: var(--flag-gold);
+        }
+
+        .hero-subtitle {
+            font-size: 1.125rem;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 2.5rem;
+            max-width: 550px;
+            line-height: 1.7;
+        }
+
+        .hero-form {
+            display: flex;
+            gap: 0;
+            max-width: 500px;
+            margin-bottom: 1rem;
+        }
+
+        .hero-form input {
+            flex: 1;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-family: var(--font);
+            background: var(--gray-100);
+            border: 2px solid transparent;
+            color: var(--flag-black);
+        }
+
+        .hero-form input::placeholder {
+            color: var(--gray-500);
+        }
+
+        .hero-form input:focus {
+            outline: none;
+            border-color: var(--flag-gold);
+            background: var(--white);
+        }
+
+        .hero-form button {
+            padding: 1rem 2rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            font-family: var(--font);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--flag-red);
+            color: var(--white);
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .hero-form button:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .hero-form button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            filter: none;
+        }
+
+        .form-message {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            min-height: 1.5em;
+        }
+
+        .form-message.success {
+            color: #4CAF50;
+        }
+
+        .form-message.error {
+            color: var(--flag-red);
+        }
+
+        .hero-trust {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .hero-trust .badge {
+            background: var(--flag-gold);
+            color: var(--flag-black);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .gdpr-notice {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 0.75rem;
+            max-width: 500px;
+        }
+
+        .gdpr-notice a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: underline;
+        }
+
+        .gdpr-notice a:hover {
+            color: var(--flag-gold);
+        }
+
+        /* ========== PROBLEM SECTION ========== */
+        .problem {
+            padding: 5rem 0;
+            background: var(--white);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--gray-500);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .pain-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+        }
+
+        .pain-card {
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border: 2px solid var(--flag-black);
+            margin: -1px;
+        }
+
+        .pain-card:nth-child(1) {
+            background: var(--flag-black);
+            color: var(--white);
+        }
+
+        .pain-card:nth-child(2) {
+            background: var(--flag-red);
+            color: var(--white);
+        }
+
+        .pain-card:nth-child(3) {
+            background: var(--flag-gold);
+            color: var(--flag-black);
+        }
+
+        .pain-icon {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pain-icon svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .pain-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .pain-text {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .problem-transition {
+            text-align: center;
+            margin-top: 3rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--flag-red);
+        }
+
+        /* ========== SOLUTION SECTION ========== */
+        .solution {
+            padding: 5rem 0;
+            background: var(--gray-100);
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            position: relative;
+        }
+
+        .steps-grid::before {
+            content: '';
+            position: absolute;
+            top: 4rem;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: var(--flag-black);
+            z-index: 0;
+        }
+
+        .step-card {
+            background: var(--white);
+            border: 2px solid var(--flag-black);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-card:last-child {
+            background: var(--flag-gold);
+        }
+
+        .step-number {
+            width: 3rem;
+            height: 3rem;
+            background: var(--flag-black);
+            color: var(--white);
+            font-size: 1.25rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .step-card:last-child .step-number {
+            background: var(--flag-black);
+        }
+
+        .step-icon {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .step-icon svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .step-title {
+            font-size: 0.875rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .step-desc {
+            font-size: 0.9375rem;
+            color: var(--gray-700);
+            line-height: 1.5;
+        }
+
+        .step-card:last-child .step-desc {
+            color: var(--flag-black);
+        }
+
+        /* ========== FINAL CTA SECTION ========== */
+        .final-cta {
+            padding: 5rem 0;
+            background: var(--flag-black);
+            color: var(--white);
+            text-align: center;
+        }
+
+        .final-cta h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            margin-bottom: 2.5rem;
+            line-height: 1.1;
+        }
+
+        .final-cta h2 .gold {
+            color: var(--flag-gold);
+        }
+
+        .final-cta .hero-form {
+            margin: 0 auto 1rem;
+            justify-content: center;
+        }
+
+        .final-cta .form-message {
+            text-align: center;
+        }
+
+        .final-cta .gdpr-notice {
+            margin: 0.75rem auto 0;
+            text-align: center;
+        }
+
+        .final-cta .reassurance {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 0.5rem;
+        }
+
+        /* ========== FOOTER ========== */
+        footer {
+            background: var(--flag-black);
+            color: rgba(255, 255, 255, 0.4);
+            padding: 2rem 0;
+            text-align: center;
+            font-size: 0.875rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            margin: 0 0.5rem;
+        }
+
+        footer a:hover {
+            color: var(--flag-gold);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 900px) {
+            .pain-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .steps-grid::before {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero {
+                padding: 3rem 0 4rem;
+            }
+
+            .hero-form {
+                flex-direction: column;
+            }
+
+            .hero-form button {
+                width: 100%;
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-logo">
+                    <span class="white">Vergabe</span><span class="red">Meis</span><span class="gold">ter</span>
+                </div>
+
+                <h1>
+                    Deine KI schreibt das Angebot.<br>
+                    <span class="gold">Du gewinnst den Auftrag.</span>
+                </h1>
+
+                <p class="hero-subtitle">
+                    VergabeMeister findet passende Ausschreibungen, formuliert dein Angebot und führt dich Schritt für Schritt bis zur Abgabe.
+                </p>
+
+                <form class="hero-form" data-signup-form>
+                    <input type="email" name="email" placeholder="Deine E-Mail-Adresse" required>
+                    <button type="submit">Platz sichern &#8594;</button>
+                </form>
+                <div class="form-message" data-form-message></div>
+
+                <div class="hero-trust">
+                    <span class="badge">Neu</span>
+                    <span>Bereits <span id="waitlist-count">...</span> Interessenten auf der Warteliste</span>
+                </div>
+
+                <p class="gdpr-notice">
+                    Mit der Anmeldung stimmst du zu, dass wir deine E-Mail-Adresse speichern, um dich über den Start zu informieren. Mehr in unserer <a href="#">Datenschutzerklärung</a>.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <div class="tricolor"><span></span><span></span><span></span></div>
+
+    <!-- PROBLEM SECTION -->
+    <section class="problem">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Vergabe ist mächtig. Aber der Aufwand?</h2>
+                <p class="section-subtitle">
+                    Ob du schon Vergabe-Profi bist oder gerade erst anfängst — eins weißt du:
+                </p>
+            </div>
+
+            <div class="pain-grid">
+                <!-- Card 1: Stunden (black bg) — ThinkingIcon -->
+                <div class="pain-card">
+                    <div class="pain-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="24" height="24" fill="#6B6B6B"/>
+                            <polygon points="0,8 8,0 24,0 24,8" fill="#0D0D0D" opacity="0.3"/>
+                            <rect x="7" y="10" width="3" height="3" fill="#0D0D0D"/>
+                            <rect x="14" y="10" width="3" height="3" fill="#0D0D0D"/>
+                            <rect x="9" y="16" width="6" height="2" fill="#0D0D0D"/>
+                            <rect x="17" y="6" width="3" height="3" fill="#F4D03F"/>
+                            <rect x="19" y="3" width="2" height="2" fill="#F4D03F"/>
+                            <rect x="21" y="1" width="1.5" height="1.5" fill="#F4D03F"/>
+                        </svg>
+                    </div>
+                    <div class="pain-label">Stunden</div>
+                    <p class="pain-text">Passende Ausschreibungen finden kostet Stunden</p>
+                </div>
+
+                <!-- Card 2: Tage (red bg) — FireIcon -->
+                <div class="pain-card">
+                    <div class="pain-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="24" height="24" fill="#0D0D0D"/>
+                            <polygon points="12,3 15,8 18,10 16,15 17,20 12,22 7,20 8,15 6,10 9,8" fill="#E63946"/>
+                            <polygon points="12,8 14,11 13,15 12,17 11,15 10,11" fill="#F4D03F"/>
+                            <polygon points="11,12 12,14 13,12 12.5,11" fill="#FFFFFF"/>
+                        </svg>
+                    </div>
+                    <div class="pain-label">Tage</div>
+                    <p class="pain-text">Angebote schreiben kostet Tage</p>
+                </div>
+
+                <!-- Card 3: Aufträge (gold bg) — SadIcon -->
+                <div class="pain-card">
+                    <div class="pain-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="24" height="24" fill="#6B6B6B"/>
+                            <polygon points="0,0 24,0 24,6 0,8" fill="#0D0D0D" opacity="0.2"/>
+                            <rect x="7" y="9" width="3" height="3" fill="#0D0D0D"/>
+                            <rect x="14" y="9" width="3" height="3" fill="#0D0D0D"/>
+                            <polygon points="8,17 12,14 16,17 15,17 12,15 9,17" fill="#0D0D0D"/>
+                        </svg>
+                    </div>
+                    <div class="pain-label">Aufträge</div>
+                    <p class="pain-text">Formfehler kosten Aufträge</p>
+                </div>
+            </div>
+
+            <p class="problem-transition">Das muss nicht sein.</p>
+        </div>
+    </section>
+
+    <div class="tricolor"><span></span><span></span><span></span></div>
+
+    <!-- SOLUTION SECTION -->
+    <section class="solution">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Finden. Schreiben. Einreichen. Gewinnen.</h2>
+            </div>
+
+            <div class="steps-grid">
+                <!-- Step 1: Finden — StarIcon -->
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="24" height="24" fill="#E63946"/>
+                            <polygon points="12,3 14,9 20,10 16,14 17,20 12,17 7,20 8,14 4,10 10,9" fill="#F4D03F"/>
+                            <polygon points="12,7 13,10 16,11 14,13 14,16 12,14 10,16 10,13 8,11 11,10" fill="#0D0D0D"/>
+                        </svg>
+                    </div>
+                    <h3 class="step-title">Finden</h3>
+                    <p class="step-desc">KI sucht passende Vergaben für dein Profil</p>
+                </div>
+
+                <!-- Step 2: Schreiben — IdeaIcon -->
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="24" height="24" fill="#F4D03F"/>
+                            <polygon points="0,0 8,0 0,8" fill="#E63946"/>
+                            <polygon points="24,24 16,24 24,16" fill="#E63946"/>
+                            <polygon points="12,4 16,8 16,14 14,16 10,16 8,14 8,8" fill="#0D0D0D"/>
+                            <rect x="10" y="16" width="4" height="2" fill="#0D0D0D"/>
+                            <rect x="10.5" y="18" width="3" height="2" fill="#0D0D0D"/>
+                            <polygon points="10,8 12,10 14,8 13,7 12,6 11,7" fill="#F4D03F"/>
+                        </svg>
+                    </div>
+                    <h3 class="step-title">Schreiben</h3>
+                    <p class="step-desc">KI formuliert dein komplettes Angebot</p>
+                </div>
+
+                <!-- Step 3: Einreichen — RocketIcon -->
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="24" height="24" fill="#0D0D0D"/>
+                            <polygon points="0,12 0,24 6,18 6,12" fill="#E63946"/>
+                            <polygon points="24,12 24,24 18,18 18,12" fill="#F4D03F"/>
+                            <polygon points="12,2 16,10 16,18 12,22 8,18 8,10" fill="#FFFFFF"/>
+                            <polygon points="10,10 12,6 14,10 13,11 11,11" fill="#E63946"/>
+                            <rect x="10" y="13" width="4" height="1" fill="#F4D03F"/>
+                            <polygon points="8,18 6,20 6,22 8,20" fill="#F4D03F"/>
+                            <polygon points="16,18 18,20 18,22 16,20" fill="#E63946"/>
+                        </svg>
+                    </div>
+                    <h3 class="step-title">Einreichen</h3>
+                    <p class="step-desc">KI prüft &amp; führt dich durch die Abgabe</p>
+                </div>
+
+                <!-- Step 4: Gewinnen — CelebrationIcon -->
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="24" height="24" fill="#0D0D0D"/>
+                            <polygon points="12,2 14,6 18,7 14,9 13,13 12,9 8,8 11,6" fill="#F4D03F"/>
+                            <polygon points="4,4 6,4 6,6 4,6" fill="#E63946"/>
+                            <polygon points="18,3 21,3 21,6 18,6" fill="#F4D03F"/>
+                            <polygon points="3,15 5,18 3,18" fill="#E63946"/>
+                            <polygon points="19,16 22,19 19,19" fill="#F4D03F"/>
+                            <rect x="7" y="10" width="3" height="3" fill="#FFFFFF"/>
+                            <rect x="14" y="10" width="3" height="3" fill="#FFFFFF"/>
+                            <polygon points="8,16 12,19 16,16 14,16 12,17 10,16" fill="#FFFFFF"/>
+                        </svg>
+                    </div>
+                    <h3 class="step-title">Gewinnen</h3>
+                    <p class="step-desc">Du präsentierst &amp; gewinnst den Auftrag</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="tricolor"><span></span><span></span><span></span></div>
+
+    <!-- FINAL CTA SECTION -->
+    <section class="final-cta">
+        <div class="container">
+            <h2>
+                Du bringst die Expertise.<br>
+                <span class="gold">Die KI bringt das Angebot.</span>
+            </h2>
+
+            <form class="hero-form" data-signup-form>
+                <input type="email" name="email" placeholder="Deine E-Mail-Adresse" required>
+                <button type="submit">Jetzt Platz sichern</button>
+            </form>
+            <div class="form-message" data-form-message></div>
+
+            <p class="reassurance">
+                Wir informieren dich, sobald wir starten. Kein Spam. Versprochen.
+            </p>
+
+            <p class="gdpr-notice">
+                Mit der Anmeldung stimmst du zu, dass wir deine E-Mail-Adresse speichern. Mehr in unserer <a href="#">Datenschutzerklärung</a>.
+            </p>
+        </div>
+    </section>
+
+    <div class="tricolor"><span></span><span></span><span></span></div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p>
+                &copy; 2026 VergabeMeister &middot;
+                <a href="#">Impressum</a> &middot;
+                <a href="#">Datenschutz</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Waitlist counter ---
+        (async function loadCount() {
+            try {
+                const res = await fetch('/api/count');
+                const data = await res.json();
+                const el = document.getElementById('waitlist-count');
+                if (el && typeof data.count === 'number') {
+                    el.textContent = data.count;
+                }
+            } catch {
+                // Silently fail — counter stays as "..."
+            }
+        })();
+
+        // --- Signup form handling ---
+        document.querySelectorAll('[data-signup-form]').forEach(function(form) {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                var btn = form.querySelector('button');
+                var msg = form.nextElementSibling;
+                var input = form.querySelector('input[name="email"]');
+                var email = input.value.trim();
+
+                if (!email) return;
+
+                btn.disabled = true;
+                btn.textContent = 'Wird eingetragen...';
+                msg.textContent = '';
+                msg.className = 'form-message';
+
+                try {
+                    var res = await fetch('/api/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: email })
+                    });
+
+                    var data = await res.json();
+
+                    if (res.ok) {
+                        msg.textContent = data.message;
+                        msg.className = 'form-message success';
+                        input.value = '';
+
+                        // Refresh counter
+                        try {
+                            var countRes = await fetch('/api/count');
+                            var countData = await countRes.json();
+                            var el = document.getElementById('waitlist-count');
+                            if (el && typeof countData.count === 'number') {
+                                el.textContent = countData.count;
+                            }
+                        } catch {}
+                    } else {
+                        msg.textContent = data.error || 'Fehler bei der Anmeldung.';
+                        msg.className = 'form-message error';
+                    }
+                } catch {
+                    msg.textContent = 'Netzwerkfehler. Bitte versuche es erneut.';
+                    msg.className = 'form-message error';
+                }
+
+                btn.disabled = false;
+                btn.textContent = form.closest('.final-cta') ? 'Jetzt Platz sichern' : 'Platz sichern \u2192';
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "vergabemeister-landing",
+  "version": "1.0.0",
+  "description": "VergabeMeister pre-launch landing page with waitlist signup",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "setup-brevo": "node scripts/setup-brevo.js"
+  },
+  "dependencies": {
+    "@getbrevo/brevo": "^2.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0"
+  }
+}
