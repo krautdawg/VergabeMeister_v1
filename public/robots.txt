@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /wp-admin/
+Disallow: /wp-login.php
+Disallow: /product/
+Disallow: /LatestVideo/
 
 Sitemap: https://vergabemeister.de/sitemap.xml
