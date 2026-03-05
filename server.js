@@ -9,6 +9,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust reverse proxy (Coolify/Traefik) for rate limiting and IP detection
+app.set('trust proxy', 1);
+
 app.use(cors());
 app.use(express.json());
 
